@@ -1,0 +1,5 @@
+<div class="navbar-clinic-name">
+    {% if request.user.is_authenticated %}
+        🏥 {{ request.user.client.clinic_name }}
+    {% endif %}
+</div>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bot.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">📅 Agendamentos</h2>
+
+<a href="/appointments/novo/" class="btn btn-primary mb-3">+ Novo Agendamento</a>
+
+<div class="config-box">
+
+{% if agendamentos %}
+    {% for a in agendamentos %}
+        <div class="message-card">
+
+            <div class="d-flex justify-content-between">
+                <strong>{{ a.paciente }}</strong>
+                <span>{{ a.data|date:"d/m" }} — {{ a.hora|time:"H:i" }}</span>
+            </div>
+
+            <div class="text">
+                {{ a.procedimento }}<br>
+                <small>Status: {{ a.status }}</small>
+            </div>
+
+            {% if a.obs %}
+                <small>Obs: {{ a.obs }}</small>
+            {% endif %}
+
+        </div>
+    {% endfor %}
+{% else %}
+
+    <div class="empty-conv">
+        Nenhum agendamento registrado ainda.<br>
+        Clique em “Novo Agendamento”.
+    </div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

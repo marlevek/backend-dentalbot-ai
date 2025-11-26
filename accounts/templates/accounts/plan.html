@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/plan.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">💼 Plano e Faturamento</h2>
+
+<div class="plan-box">
+
+    <div class="plan-title">
+        Plano Atual: {{ client.plan.name }}
+    </div>
+
+    <hr>
+
+    <h5>Status da Assinatura:</h5>
+    <p class="plan-status
+        {% if client.status == 'trial' %} status-trial
+        {% elif client.status == 'active' %} status-active
+        {% else %} status-suspended
+        {% endif %}
+    ">
+        {% if client.status == 'trial' %}
+            🟡 Em período de teste
+        {% elif client.status == 'active' %}
+            🟢 Ativo
+        {% else %}
+            🔴 Suspenso
+        {% endif %}
+    </p>
+
+    {% if client.status == "trial" %}
+        <p>
+            Expira em:
+            <strong>{{ client.trial_expires_at|date:"d/m/Y H:i" }}</strong>
+        </p>
+
+        <p>
+            Dias restantes:
+            <strong>
+                {{ client.trial_expires_at|timesince }} 
+            </strong>
+        </p>
+    {% endif %}
+
+    <hr>
+
+    <h5>API Key:</h5>
+    <div class="api-key-box">
+        {{ client.api_key }}
+    </div>
+
+    <hr>
+
+    <h5>Recursos do plano:</h5>
+    <ul>
+        <li>Até {{ client.plan.max_conversations }} conversas por mês</li>
+        <li>Atendimento por WhatsApp automatizado</li>
+        <li>Integração via API (WPPConnect)</li>
+        <li>Dashboard em tempo real</li>
+        <li>Registro de conversas</li>
+    </ul>
+
+</div>
+
+{% endblock %}

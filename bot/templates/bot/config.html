@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bot.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">🤖 Configurações do Bot</h2>
+
+<div class="config-box">
+
+    <h3>Configurações da Sessão</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Nome da Sessão</label>
+            <input type="text" name="session_name" class="form-control" value="{{ config.session_name }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">URL da Instância WPPConnect</label>
+            <input type="url" name="instance_url" class="form-control" value="{{ config.instance_url }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Número Conectado</label>
+            <input type="text" class="form-control" value="{{ config.whatsapp_number|default:'Nenhum' }}" disabled>
+        </div>
+
+        <button class="btn btn-sync w-100">Salvar Configurações</button>
+    </form>
+
+    <hr>
+
+    <h4>Status do Bot</h4>
+    {% if config.status == "online" %}
+        <p class="status-online">🟢 Online</p>
+    {% else %}
+        <p class="status-offline">🔴 Offline</p>
+    {% endif %}
+
+    <h4 class="mt-4">QR Code</h4>
+    <div class="qr-box">
+        {% if config.qr_code %}
+            <img src="data:image/png;base64,{{ config.qr_code }}" alt="QR Code">
+        {% else %}
+            <p>Nenhum QR Code disponível no momento.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

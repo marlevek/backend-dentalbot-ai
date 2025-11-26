@@ -1,0 +1,28 @@
+/* ===============================
+   CSS de Autenticação — Login e Registro
+   =============================== */
+
+body {
+    background: #f0f4f9;
+}
+
+.auth-box {
+    max-width: 450px;
+    background: #fff;
+    padding: 35px;
+    margin: 80px auto;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.brand {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #003f7a;
+}
+
+.brand span {
+    color: #ffcc00;
+}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bot.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">⚙️ Atendimento Automático</h2>
+
+<div class="config-box">
+
+<form method="POST">
+    {% csrf_token %}
+
+    <h5>Mensagem de Boas-Vindas</h5>
+    <textarea name="welcome_message" class="form-control mb-3" rows="3">{{ config.welcome_message }}</textarea>
+
+    <h5>Mensagem Fora do Horário</h5>
+    <textarea name="out_of_hours_message" class="form-control mb-3" rows="3">{{ config.out_of_hours_message }}</textarea>
+
+    <h5>Horário de Atendimento</h5>
+    <div class="row mb-3">
+        <div class="col">
+            <label>Início:</label>
+            <input type="time" name="working_start" class="form-control" value="{{ config.working_start }}">
+        </div>
+        <div class="col">
+            <label>Fim:</label>
+            <input type="time" name="working_end" class="form-control" value="{{ config.working_end }}">
+        </div>
+    </div>
+
+    <h5>Perguntas Frequentes</h5>
+
+    <label>Clareamento</label>
+    <textarea name="faq_clareamento" class="form-control mb-3">{{ config.faq_clareamento }}</textarea>
+
+    <label>Implante</label>
+    <textarea name="faq_implante" class="form-control mb-3">{{ config.faq_implante }}</textarea>
+
+    <label>Aparelho / Ortodontia</label>
+    <textarea name="faq_aparelho" class="form-control mb-3">{{ config.faq_aparelho }}</textarea>
+
+    <label>Orçamento</label>
+    <textarea name="faq_orcamento" class="form-control mb-3">{{ config.faq_orcamento }}</textarea>
+
+    <button class="btn btn-sync w-100">Salvar Configurações</button>
+
+</form>
+
+</div>
+
+{% endblock %}
+

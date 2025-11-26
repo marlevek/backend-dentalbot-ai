@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bot.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">➕ Novo Agendamento</h2>
+
+<div class="config-box">
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Paciente</label>
+    <input type="text" name="paciente" class="form-control mb-3" required>
+
+    <label>Telefone</label>
+    <input type="text" name="telefone" class="form-control mb-3" required>
+
+    <label>Procedimento</label>
+    <select name="procedimento" class="form-control mb-3" required>
+        <option>Clareamento</option>
+        <option>Avaliação</option>
+        <option>Implante</option>
+        <option>Ortodontia</option>
+        <option>Limpeza</option>
+        <option>Urgência</option>
+    </select>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label>Data</label>
+            <input type="date" name="data" class="form-control" required>
+        </div>
+        <div class="col">
+            <label>Hora</label>
+            <input type="time" name="hora" class="form-control" required>
+        </div>
+    </div>
+
+    <label>Observações</label>
+    <textarea name="obs" class="form-control mb-3"></textarea>
+
+    <button class="btn btn-sync w-100">Salvar</button>
+
+</form>
+
+</div>
+
+{% endblock %}

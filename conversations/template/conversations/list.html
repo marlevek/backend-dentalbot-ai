@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/conversations.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">💬 Conversas</h2>
+
+{% if conversations %}
+    {% for msg in conversations %}
+        <div class="message-card">
+
+            <div class="sender">
+                {{ msg.sender }}
+                <span class="direction">
+                    ({{ msg.get_direction_display }})
+                </span>
+            </div>
+
+            <div class="text">
+                {{ msg.message|default:"Mensagem vazia" }}
+            </div>
+
+            <small>{{ msg.timestamp|date:"d/m/Y H:i" }}</small>
+        </div>
+    {% endfor %}
+{% else %}
+
+    <div class="empty-conv">
+        Nenhuma conversa registrada ainda.<br>
+        Seu bot começará a registrar mensagens automaticamente.
+    </div>
+
+{% endif %}
+
+{% endblock %}

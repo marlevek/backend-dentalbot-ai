@@ -1,0 +1,123 @@
+body {
+    background: #f5f7fa;
+}
+
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #003f7a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #fff;
+}
+
+.sidebar a {
+    color: #fff !important;
+    padding: 12px 20px;
+    display: block;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background: #004b93;
+}
+
+.topbar {
+    margin-left: 240px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 20px;
+}
+
+.content {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+.brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+    background: #002b52;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.brand span {
+    color: #ffcc00;
+}
+
+/* ===============================
+   RESPONSIVIDADE
+   =============================== */
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none !important;
+    }
+    .content {
+        margin-left: 0 !important;
+        padding: 20px;
+    }
+}
+
+/* ===============================
+   MENU MOBILE (Offcanvas)
+   =============================== */
+
+.offcanvas-body a {
+    display: block !important;
+    padding: 12px 16px !important;
+    font-size: 1.1rem;
+    text-decoration: none !important;
+    color: #003f7a !important;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.offcanvas-body a:hover {
+    background: #e8f2ff !important;
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.offcanvas-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.offcanvas-title span {
+    color: #ffcc00;
+}
+
+/* ==========================================
+   Nome da clínica na Navbar (desktop/mobile)
+   ========================================== */
+
+.navbar-clinic-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Mobile: centralizar nome da clínica */
+@media (max-width: 768px) {
+    .navbar-clinic-name {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Desktop: alinhar a direita */
+@media (min-width: 769px) {
+    .navbar-clinic-name {
+        margin-left: auto;
+        margin-right: 1rem;
+        text-align: right;
+    }
+}
+

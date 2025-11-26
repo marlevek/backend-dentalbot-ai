@@ -1,0 +1,47 @@
+/* ===============================
+   DASHBOARD — CoderTec Style
+   =============================== */
+
+.card-metric {
+    border-radius: 12px;
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #e4e6e8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card-metric h3 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #003f7a;
+}
+
+.card-metric p {
+    margin: 0;
+    color: #555;
+}
+
+.message-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #e1e2e5;
+    margin-bottom: 10px;
+}
+
+.message-item .sender {
+    font-weight: bold;
+    color: #003f7a;
+}
+
+.message-item .text {
+    color: #333;
+}
+
+.empty-box {
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    color: #777;
+}

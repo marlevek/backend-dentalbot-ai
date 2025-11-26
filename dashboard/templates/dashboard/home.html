@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<!-- Métricas -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p>Total de Conversas no Mês</p>
+            <h3>{{ total_conversations }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p>Plano Atual</p>
+            <h3>{{ client.plan.name }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p>Status do Bot</p>
+            <h3>
+    {% if client.botconfig.status == "online" %}
+        🟢 Online
+    {% else %}
+        🔴 Offline
+    {% endif %}
+</h3>
+        </div>
+    </div>
+
+</div>
+
+<!-- Últimas Mensagens -->
+<h4 class="mb-3">Últimas Mensagens</h4>
+
+{% if last_messages %}
+    {% for msg in last_messages %}
+        <div class="message-item">
+            <div class="sender">{{ msg.sender }}</div>
+            <div class="text">{{ msg.message }}</div>
+            <small class="text-muted">{{ msg.timestamp|date:"d/m/Y H:i" }}</small>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-box">
+        Nenhuma mensagem recebida ainda.
+    </div>
+{% endif %}
+
+{% endblock %}
