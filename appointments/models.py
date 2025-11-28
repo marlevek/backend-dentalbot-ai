@@ -6,8 +6,10 @@ PROCEDIMENTOS = [
     ("Avaliação", "Avaliação"),
     ("Implante", "Implante"),
     ("Ortodontia", "Ortodontia"),
-    ("Limpeza", "Limpeza"),
-    ("Urgência", "Urgência"),
+    ("Profilaxia", "Profilaxia"),
+    ("Restauracao", "Restauração"),
+    ("Endodontia", "Endodontia"),
+    ("Exodontia", "Exodontia"),
 ]
 
 STATUS = [

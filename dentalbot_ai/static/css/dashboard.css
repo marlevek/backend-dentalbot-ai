@@ -1,7 +1,8 @@
-/* ===============================
-   DASHBOARD — CoderTec Style
-   =============================== */
+/* =========================================
+   DASHBOARD — CoderTec Style (PREMIUM)
+   ========================================= */
 
+/* ---- MÉTRICAS ---- */
 .card-metric {
     border-radius: 12px;
     padding: 25px;
@@ -10,15 +11,8 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.card-metric h3 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #003f7a;
-}
-
-.card-metric p {
-    margin: 0;
-    color: #555;
+.dashboard-section {
+    margin-bottom: 30px;
 }
 
 .message-item {
@@ -29,19 +23,113 @@
     margin-bottom: 10px;
 }
 
-.message-item .sender {
-    font-weight: bold;
-    color: #003f7a;
-}
-
-.message-item .text {
-    color: #333;
-}
-
 .empty-box {
     text-align: center;
     padding: 60px 20px;
     border: 2px dashed #ccc;
     border-radius: 12px;
     color: #777;
+}
+
+
+/* =========================================
+   FULLCALENDAR — Layout Premium
+   ========================================= */
+
+/* célula inteira vira flex horizontal */
+.fc-list-event-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    justify-content: flex-start !important;
+    padding: 10px 0 !important;
+}
+
+/* ícone */
+.fc-list-event-title img {
+    width: 22px !important;
+    height: 22px !important;
+    margin-right: 6px !important;
+    opacity: 0.8;
+}
+
+/* horário fica onde o FullCalendar já coloca (na coluna esquerda) */
+
+/* texto do evento */
+.fc-event-text {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: 600;
+    color: #003f7a;
+    white-space: nowrap !important;
+}
+
+/* container dos botões */
+.schedule-actions {
+    display: inline-flex !important;
+    gap: 8px !important;
+    margin-left: auto !important;   
+    align-items: center !important;
+}
+
+/* botões */
+.btn-edit,
+.btn-cancel {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    padding: 6px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+}
+
+/* editar */
+.btn-edit {
+    background: #0066ff !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* cancelar */
+.btn-cancel {
+    background: #fff !important;
+    color: #d10000 !important;
+    border: 1px solid #d10000 !important;
+} 
+
+/* remover ponto colorido padrão do FC */
+.fc-list-event-dot {
+    display: none !important;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    .fc-list-event-title {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+}
+
+
+.message-item {
+    border: 1px solid #e4e6e8;
+    border-radius: 12px;
+    padding: 15px;
+    background: #fff;
+}
+
+.inbox-item {
+    border: 1px solid #e4e6e8;
+    background: #fff;
+    transition: 0.2s;
+}
+
+.inbox-item:hover {
+    background: #f4f8ff;
+    border-color: #d0d7ff;
 }

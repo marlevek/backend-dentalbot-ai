@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="chat-container">
+
+    <!-- LISTA -->
+    <div class="chat-list">
+        <a href="/conversations/" class="back-btn">⬅ Voltar</a>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-box">
+
+        <div class="chat-header">
+            <strong>{{ phone }}</strong>
+        </div>
+
+        <div class="chat-messages">
+
+            {% for msg in messages %}
+                {% if msg.is_from_bot %}
+                    <div class="msg msg-sent">
+                        {{ msg.message }}
+                        <small>{{ msg.timestamp|date:"H:i" }}</small>
+                    </div>
+                {% else %}
+                    <div class="msg msg-received">
+                        {{ msg.message }}
+                        <small>{{ msg.timestamp|date:"H:i" }}</small>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+
+        <!-- FORM ENVIAR -->
+        <form method="POST" class="chat-input" action="/conversations/{{ phone }}/send/">
+            {% csrf_token %}
+            <input type="text" name="message" placeholder="Digite sua mensagem..." required>
+            <button type="submit">Enviar</button>
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+function updateMessages() {
+
+    fetch(`/conversations/{{ phone }}/messages/`)
+        .then(response => response.json())
+        .then(data => {
+
+            const box = document.querySelector(".chat-messages");
+            box.innerHTML = "";
+
+            data.messages.forEach(msg => {
+
+                let div = document.createElement("div");
+                div.classList.add("msg");
+
+                if (msg.is_from_bot) {
+                    div.classList.add("msg-sent");
+                } else {
+                    div.classList.add("msg-received");
+                }
+
+                div.innerHTML = `
+                    ${msg.message}
+                    <small>${msg.timestamp}</small>
+                `;
+
+                box.appendChild(div);
+            });
+
+            // Auto-scroll para o final
+            box.scrollTop = box.scrollHeight;
+        });
+}
+
+// Atualiza a cada 2 segundos
+setInterval(updateMessages, 2000);
+
+// Carrega ao abrir a página
+updateMessages();
+</script>
+
+{% endblock %}

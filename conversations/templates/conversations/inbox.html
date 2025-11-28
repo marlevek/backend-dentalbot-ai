@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    <img src="https://cdn-icons-png.flaticon.com/512/3917/3917754.png"
+         width="28" class="me-2">
+    Conversas
+</h2>
+
+<div class="card p-4 shadow-sm">
+
+    {% if conversations %}
+    
+        {% for c in conversations %}
+        <a href="/conversations/{{ c.phone }}/"
+           class="d-flex align-items-center p-3 mb-3 rounded conversation-item">
+           
+            <img src="/static/img/procedures/default-user.png"
+                 class="rounded-circle me-3"
+                 width="48" height="48">
+
+            <div class="flex-grow-1">
+                <strong class="d-block">{{ c.phone }}</strong>
+                <small class="text-muted">
+                    {% if c.unread_count > 0 %}
+                        {{ c.unread_count }} novas mensagens
+                    {% else %}
+                        Nenhuma mensagem nova
+                    {% endif %}
+                </small>
+            </div>
+
+            {% if c.unread_count > 0 %}
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ c.unread_count }}
+            </span>
+            {% endif %}
+        </a>
+        {% endfor %}
+
+    {% else %}
+
+        <p class="text-center text-muted m-0">
+            Nenhuma conversa iniciada ainda.
+        </p>
+
+    {% endif %}
+</div>
+
+{% endblock %}

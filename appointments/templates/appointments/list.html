@@ -2,46 +2,156 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/bot.css' %}">
+<link rel="stylesheet" href="{% static 'css/appointments.css' %}">
 {% endblock %}
 
 {% block content %}
 
 <h2 class="mb-4">📅 Agendamentos</h2>
 
-<a href="/appointments/novo/" class="btn btn-primary mb-3">+ Novo Agendamento</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="/appointments/novo/" class="btn btn-primary">
+        + Novo Agendamento
+    </a>
+</div>
 
-<div class="config-box">
+<div class="card p-3 shadow-sm">
 
-{% if agendamentos %}
-    {% for a in agendamentos %}
-        <div class="message-card">
+    {% if agendamentos %}
 
-            <div class="d-flex justify-content-between">
-                <strong>{{ a.paciente }}</strong>
-                <span>{{ a.data|date:"d/m" }} — {{ a.hora|time:"H:i" }}</span>
-            </div>
+    <!-- ======================= -->
+    <!-- DESKTOP TABLE PREMIUM -->
+    <!-- ======================= -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle table-premium">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Procedimento</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th class="text-end" style="width: 1%; white-space: nowrap;">Ações</th>
+                </tr>
+            </thead>
 
-            <div class="text">
-                {{ a.procedimento }}<br>
-                <small>Status: {{ a.status }}</small>
-            </div>
+            <tbody>
+            {% for a in agendamentos %}
+                <tr>
+                    <td>
+                        <strong>{{ a.paciente }}</strong>
+                    </td>
 
-            {% if a.obs %}
-                <small>Obs: {{ a.obs }}</small>
-            {% endif %}
+                    <td>
+                        <img src="{{ a.icon }}" style="height:20px;width:20px;margin-right:6px;vertical-align:middle;">
+                        {{ a.procedimento }}
+                    </td>
 
-        </div>
-    {% endfor %}
-{% else %}
+                    <td>{{ a.status }}</td>
 
-    <div class="empty-conv">
-        Nenhum agendamento registrado ainda.<br>
-        Clique em “Novo Agendamento”.
+                    <td>
+                        {{ a.data|date:"d/m" }} — {{ a.hora|time:"H:i" }}
+                    </td>
+
+                    <td class="text-end" style="white-space: nowrap; width:1%;">
+
+                        <a href="/appointments/editar/{{ a.id }}/"
+                           class="btn-edit me-2">
+                            Editar
+                        </a>
+
+                        <button class="btn-cancel"
+                                onclick="openDeleteModal('{{ a.id }}', '{{ a.paciente }}')">
+                            Cancelar
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
     </div>
 
-{% endif %}
+    <!-- ======================= -->
+    <!-- MOBILE CARD PREMIUM -->
+    <!-- ======================= -->
+    <div class="d-md-none">
+        {% for a in agendamentos %}
+        <div class="appointment-card mb-3">
+
+            <h5 class="mb-2 d-flex align-items-center gap-2">
+                <img src="{{ a.icon }}" alt="">
+                {{ a.paciente }}
+            </h5>
+
+            <p class="mb-1">
+                <strong>Procedimento:</strong> {{ a.procedimento }}
+            </p>
+
+            <p class="mb-1">
+                <strong>Status:</strong> {{ a.status }}
+            </p>
+
+            <p class="mb-3">
+                <strong>Data:</strong>
+                {{ a.data|date:"d/m" }} — {{ a.hora|time:"H:i" }}
+            </p>
+
+            <a href="/appointments/editar/{{ a.id }}/"
+               class="btn-edit w-100 mb-2">
+                Editar
+            </a>
+
+            <button class="btn-cancel w-100"
+                    onclick="openDeleteModal('{{ a.id }}', '{{ a.paciente }}')">
+                Cancelar
+            </button>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+        <p class="text-muted text-center m-0">Nenhum agendamento registrado.</p>
+    {% endif %}
 
 </div>
+
+
+<!-- ======================= -->
+<!-- MODAL DE CONFIRMAÇÃO -->
+<!-- ======================= -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Cancelar Agendamento</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        Tem certeza que deseja cancelar o agendamento de 
+        <strong id="modalPaciente"></strong>?
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+        <a id="btnConfirmDelete" href="#" class="btn btn-danger">
+            Sim, cancelar
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+function openDeleteModal(id, paciente) {
+    document.getElementById("modalPaciente").innerText = paciente;
+    document.getElementById("btnConfirmDelete").href = `/appointments/event/${id}/delete/`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
 
 {% endblock %}

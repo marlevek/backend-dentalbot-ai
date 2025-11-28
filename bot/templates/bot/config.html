@@ -7,49 +7,199 @@
 
 {% block content %}
 
-<h2 class="mb-4">🤖 Configurações do Bot</h2>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-<div class="config-box">
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
 
-    <h3>Configurações da Sessão</h3>
+    if (tab) {
+        const button = document.querySelector(`[data-bs-target="#tab-${tab}"]`);
+        if (button) {
+            new bootstrap.Tab(button).show();
+        }
+    } else {
+        // Abre a primeira aba caso nenhuma seja enviada
+        const first = document.querySelector('.bot-tabs button');
+        if (first) {
+            new bootstrap.Tab(first).show();
+        }
+    }
 
-    <form method="POST">
-        {% csrf_token %}
+});
+</script>
 
-        <div class="mb-3">
-            <label class="form-label">Nome da Sessão</label>
-            <input type="text" name="session_name" class="form-control" value="{{ config.session_name }}">
+
+
+<h2 class="page-title mb-4">🤖 Configurações do Bot</h2>
+
+<!-- Navegação entre abas -->
+<ul class="nav nav-tabs bot-tabs" id="botTabs">
+
+    <li class="nav-item">
+        <button class="nav-link {% if active_tab == 'session' %}active{% endif %}" 
+                data-bs-toggle="tab" data-bs-target="#tab-session">
+            Sessão WPPConnect
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if active_tab == 'auto' %}active{% endif %}" 
+                data-bs-toggle="tab" data-bs-target="#tab-auto">
+            Atendimento Automático
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if active_tab == 'hours' %}active{% endif %}" 
+                data-bs-toggle="tab" data-bs-target="#tab-hours">
+            Horário de Atendimento
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if active_tab == 'ia' %}active{% endif %}" 
+                data-bs-toggle="tab" data-bs-target="#tab-ia">
+            IA do Bot
+        </button>
+    </li>
+
+</ul>
+
+<div class="tab-content">
+
+    <!-- ============================ -->
+    <!-- TAB 1 - SESSÃO WPPConnect -->
+    <!-- ============================ -->
+    <div class="tab-pane fade {% if active_tab == 'session' %}show active{% endif %}" id="tab-session">
+
+        <div class="card">
+            <h3 class="section-title mb-3">Configurações da Sessão</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Nome da Sessão</label>
+                    <input type="text" name="session_name" class="form-control"
+                           value="{{ config.session_name }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">URL da Instância WPPConnect</label>
+                    <input type="url" name="instance_url" class="form-control"
+                           value="{{ config.instance_url }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Número Conectado</label>
+                    <input type="text" class="form-control" value="{{ config.whatsapp_number|default:'Nenhum' }}" disabled>
+                </div>
+
+                <button class="btn btn-primary save-btn">Salvar Configurações</button>
+            </form>
+
+            <hr>
+
+            <h4>Status do Bot</h4>
+            {% if config.status == "online" %}
+                <p class="status-online">🟢 Online</p>
+            {% else %}
+                <p class="status-offline">🔴 Offline</p>
+            {% endif %}
+
+            <h4 class="mt-4">QR Code</h4>
+            <div class="qr-box">
+                {% if config.qr_code %}
+                    <img src="data:image/png;base64,{{ config.qr_code }}" alt="QR Code">
+                {% else %}
+                    <p>Nenhum QR Code disponível.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================ -->
+    <!-- TAB 2 - ATENDIMENTO AUTOMÁTICO -->
+    <!-- ============================ -->
+    <div class="tab-pane fade {% if active_tab == 'auto' %}show active{% endif %}" id="tab-auto">
+
+        <div class="card">
+            <h3 class="section-title mb-3">Atendimento Automático</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Mensagem de boas-vindas</label>
+                    <textarea name="auto_welcome" class="form-control" rows="3">{{ config.auto_welcome }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Menu automático</label>
+                    <textarea name="auto_menu" class="form-control" rows="5">{{ config.auto_menu }}</textarea>
+                </div>
+
+                <button class="btn btn-primary save-btn">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================ -->
+    <!-- TAB 3 - HORÁRIO DE ATENDIMENTO -->
+    <!-- ============================ -->
+    <div class="tab-pane fade {% if active_tab == 'hours' %}show active{% endif %}" id="tab-hours">
+
+        <div class="card">
+            <h3 class="section-title mb-3">Horários de Atendimento</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Início</label>
+                        <input type="time" class="form-control" name="hour_start" value="{{ config.hour_start }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Fim</label>
+                        <input type="time" class="form-control" name="hour_end" value="{{ config.hour_end }}">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary mt-3 save-btn">Salvar</button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- ============================ -->
+    <!-- TAB 4 - IA DO BOT -->
+    <!-- ============================ -->
+    <div class="tab-pane fade {% if active_tab == 'ia' %}show active{% endif %}" id="tab-ia">
+
+        <div class="card">
+            <h3 class="section-title mb-3">IA do Bot</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Personalidade do Bot</label>
+                    <textarea class="form-control" name="persona" rows="4">{{ config.persona }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Prompt Principal</label>
+                    <textarea class="form-control" name="main_prompt" rows="5">{{ config.main_prompt }}</textarea>
+                </div>
+
+                <button class="btn btn-primary save-btn">Salvar</button>
+            </form>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">URL da Instância WPPConnect</label>
-            <input type="url" name="instance_url" class="form-control" value="{{ config.instance_url }}">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Número Conectado</label>
-            <input type="text" class="form-control" value="{{ config.whatsapp_number|default:'Nenhum' }}" disabled>
-        </div>
-
-        <button class="btn btn-sync w-100">Salvar Configurações</button>
-    </form>
-
-    <hr>
-
-    <h4>Status do Bot</h4>
-    {% if config.status == "online" %}
-        <p class="status-online">🟢 Online</p>
-    {% else %}
-        <p class="status-offline">🔴 Offline</p>
-    {% endif %}
-
-    <h4 class="mt-4">QR Code</h4>
-    <div class="qr-box">
-        {% if config.qr_code %}
-            <img src="data:image/png;base64,{{ config.qr_code }}" alt="QR Code">
-        {% else %}
-            <p>Nenhum QR Code disponível no momento.</p>
-        {% endif %}
     </div>
 
 </div>

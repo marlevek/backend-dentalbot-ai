@@ -22,4 +22,7 @@ def bot_config_view(request):
         api.get_status()
         api.get_qr_code()
 
-    return render(request, "bot/config.html", {"config": config})
+    return render(request, "bot/config.html", {
+        "client": client,
+        "config": config
+        })

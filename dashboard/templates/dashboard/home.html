@@ -9,53 +9,183 @@
 
 <h2 class="mb-4">📊 Dashboard</h2>
 
-<!-- Métricas -->
-<div class="row g-4 mb-4">
-
-    <div class="col-md-4">
-        <div class="card-metric">
-            <p>Total de Conversas no Mês</p>
-            <h3>{{ total_conversations }}</h3>
-        </div>
+<!-- ============================ -->
+<!-- SEÇÃO DO PLANO -->
+<!-- ============================ -->
+<div class="dashboard-section">
+    {% if is_unlimited %}
+    <div class="plan-alert mb-3">
+        ✔ Conversas Ilimitadas
     </div>
-
-    <div class="col-md-4">
-        <div class="card-metric">
-            <p>Plano Atual</p>
-            <h3>{{ client.plan.name }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card-metric">
-            <p>Status do Bot</p>
-            <h3>
-    {% if client.botconfig.status == "online" %}
-        🟢 Online
     {% else %}
-        🔴 Offline
+    <div class="plan-alert mb-3" style="background:#fff4e5; border-color:#ffa726; color:#a66300;">
+        ⚠ Você usou {{ percent_used }}% do seu plano.
+    </div>
     {% endif %}
-</h3>
+</div>
+
+<!-- MÉTRICAS -->
+<div class="row g-4 dashboard-section">
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p class="metric-title">Total de Conversas no Mês</p>
+            <p class="metric-value">{{ total_conversations }}</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p class="metric-title">Plano Atual</p>
+            <p class="metric-value">{{ client.plan.name }}</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-metric">
+            <p class="metric-title">Status do Bot</p>
+            {% if client.botconfig.status == "online" %}
+                <p class="metric-value">🟢 Online</p>
+            {% else %}
+                <p class="metric-value">🔴 Offline</p>
+            {% endif %}
         </div>
     </div>
 
 </div>
 
-<!-- Últimas Mensagens -->
-<h4 class="mb-3">Últimas Mensagens</h4>
+
+<!-- ============================ -->
+<!-- AGENDA PREMIUM -->
+<!-- ============================ -->
+
+<h4 class="mt-4 mb-3">📅 Próximos Agendamentos</h4>
+
+<div id="miniCalendar"></div>
+
+<div class="mt-3">
+    <a href="/appointments/calendar/" class="btn btn-primary btn-sm">Abrir Calendário Completo</a>
+</div>
+
+
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    var calendar = new FullCalendar.Calendar(document.getElementById('miniCalendar'), {
+        initialView: 'listWeek',
+        locale: 'pt-br',
+        height: 'auto',
+
+        headerToolbar: { left:'', center:'', right:'' },
+
+        events: '/appointments/events/',
+
+        eventDidMount: function(info) {
+
+            let el = info.el.querySelector('.fc-list-event-title');
+
+            if (el) {
+
+                let buttons = `
+                    <span class="schedule-actions">
+                        <a href="/appointments/editar/${info.event.id}/" class="btn-edit">Editar</a>
+                        <button class="btn-cancel" onclick="openCancelModal(${info.event.id})">Cancelar</button>
+                    </span>
+                `;
+
+                el.innerHTML = `
+    <img src="${info.event.extendedProps.icon}" 
+         style="height:18px;width:18px;margin-right:6px;">
+    <span class="fc-event-text">${info.event.title}</span>
+    ${buttons}
+`;
+            }
+
+            let dot = info.el.querySelector('.fc-list-event-dot');
+            if (dot) dot.style.display = "none";
+        }
+    });
+
+    calendar.render();
+});
+</script>
+
+<!-- MODAL CANCELAMENTO -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Cancelar Agendamento</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        Tem certeza que deseja cancelar este agendamento?
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+        <a id="confirmCancelBtn" class="btn btn-danger">Sim, cancelar</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function openCancelModal(id) {
+    document.getElementById("confirmCancelBtn").href = `/appointments/event/${id}/delete/`;
+    new bootstrap.Modal(document.getElementById("cancelModal")).show();
+}
+</script>
+
+
+<!-- ============================ -->
+<!-- ÚLTIMAS MENSAGENS -->
+<!-- ============================ -->
+<h4 class="mt-4 mb-3">Últimas Mensagens</h4>
 
 {% if last_messages %}
     {% for msg in last_messages %}
-        <div class="message-item">
-            <div class="sender">{{ msg.sender }}</div>
-            <div class="text">{{ msg.message }}</div>
-            <small class="text-muted">{{ msg.timestamp|date:"d/m/Y H:i" }}</small>
-        </div>
+  <div class="message-item mb-3 d-flex align-items-center p-3 rounded shadow-sm bg-white">
+    
+    <div class="me-3">
+        {% if msg.contato and msg.contato.foto_url %}
+            <img src="{{ msg.contato.foto_url }}" 
+                 class="rounded-circle" 
+                 width="45" height="45">
+        {% else %}
+            <img src="{% static 'img/default-user.png' %}"
+                 class="rounded-circle" 
+                 width="45" height="45">
+        {% endif %}
+    </div>
+
+    <div>
+        <strong>
+            {% if msg.contato %}
+                {{ msg.contato.nome|default:msg.sender }}
+            {% else %}
+                {{ msg.sender }}
+            {% endif %}
+        </strong><br>
+
+        <span class="text-muted">{{ msg.message }}</span><br>
+
+        <small class="text-secondary">
+            {{ msg.timestamp|date:"d/m/Y H:i" }}
+        </small>
+    </div>
+
+</div>
     {% endfor %}
 {% else %}
-    <div class="empty-box">
-        Nenhuma mensagem recebida ainda.
-    </div>
+    <div class="empty-box">Nenhuma mensagem recebida ainda.</div>
 {% endif %}
 
 {% endblock %}

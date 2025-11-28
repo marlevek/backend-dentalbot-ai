@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<style>
+#calendar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📅 Calendário de Agendamentos</h2>
+
+<div id="calendar"></div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+
+      <h4 class="mb-3">Editar Agendamento</h4>
+
+      <form id="modalForm">
+
+        <input type="hidden" id="event_id">
+
+        <label>Paciente</label>
+        <input type="text" id="paciente" class="form-control mb-2">
+
+        <label>Telefone</label>
+        <input type="text" id="telefone" class="form-control mb-2">
+
+        <label>Procedimento</label>
+        <select id="procedimento" class="form-control mb-2">
+            <option>Clareamento</option>
+            <option>Avaliação</option>
+            <option>Implante</option>
+            <option>Ortodontia</option>
+            <option>Exodontia</option>
+            <option>Endodontia</option>
+            <option>Restauração</option>
+            <option>Profilaxia</option>
+        </select>
+
+        <div class="row">
+          <div class="col">
+            <label>Data</label>
+            <input type="date" id="data" class="form-control mb-2">
+          </div>
+          <div class="col">
+            <label>Hora</label>
+            <input type="time" id="hora" class="form-control mb-2">
+          </div>
+        </div>
+
+        <label>Status</label>
+        <select id="status" class="form-control mb-2">
+            <option>Pendente</option>
+            <option>Confirmado</option>
+            <option>Concluído</option>
+            <option>Cancelado</option>
+        </select>
+
+        <label>Observações</label>
+        <textarea id="obs" class="form-control mb-3"></textarea>
+
+        <button type="button" id="btnSalvar" class="btn btn-primary w-100 mb-2">Salvar</button>
+        <button type="button" id="btnExcluir" class="btn btn-danger w-100">Excluir</button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        editable: true,
+        selectable: true,
+        eventResizableFromStart: true,
+
+        events: '/appointments/events/',
+
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+
+        eventDidMount: function(info) {
+
+            // TÍTULO COM IMAGEM
+            let titleEl = info.el.querySelector('.fc-event-title, .fc-list-event-title');
+            if (titleEl) {
+                titleEl.innerHTML = info.event.title;
+            }
+
+            // REMOVE O BULLET
+            let dot = info.el.querySelector('.fc-list-event-dot');
+            if (dot) dot.style.display = "none";
+        },
+
+        dateClick: function(info) {
+            window.location.href = `/appointments/novo/?data=${info.dateStr}`;
+        },
+
+        eventClick: function(info) {
+            let id = info.event.id;
+
+            fetch(`/appointments/event/${id}/`)
+            .then(res => res.json())
+            .then(data => {
+
+                document.getElementById("event_id").value = data.id;
+                document.getElementById("paciente").value = data.paciente;
+                document.getElementById("telefone").value = data.telefone;
+                document.getElementById("procedimento").value = data.procedimento;
+                document.getElementById("data").value = data.data;
+                document.getElementById("hora").value = data.hora;
+                document.getElementById("status").value = data.status;
+                document.getElementById("obs").value = data.obs;
+
+                let modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                modal.show();
+            });
+        },
+
+        eventDrop: function(info) {
+            let id = info.event.id;
+            fetch(`/appointments/event/${id}/update/`, {
+                method: "POST",
+                body: new URLSearchParams({
+                    "data": info.event.start.toISOString().slice(0,10),
+                    "hora": info.event.start.toTimeString().slice(0,5)
+                })
+            });
+        }
+
+    });
+
+    calendar.render();
+});
+</script>
+
+{% endblock %}
