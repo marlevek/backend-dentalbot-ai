@@ -6,132 +6,62 @@ from accounts.models import Client
 from .models import Contact
 from conversations.models import Conversation
 
+# --- TOKEN DE VERIFICAÇÃO DO FACEBOOK ---
+VERIFY_TOKEN = "codertec123"
 
-VERIFY_TOKEN = "coderte_webhook_2025"
 
-def receive_webhook(request):
+# ============================================================
+# 1. WEBHOOK OFICIAL DO WHATSAPP CLOUD API (GET + POST)
+# ============================================================
+
+@csrf_exempt
+def whatsapp_webhook(request):
+    # ====== GET: validação do Facebook ======
     if request.method == "GET":
-        if request.GET.get("hub.mode") == "subscribe" and \
-           request.GET.get("hub.verify_token") == VERIFY_TOKEN:
-            return HttpResponse(request.GET["hub.challenge"])
-        return HttpResponse("Token inválido")
+        mode = request.GET.get("hub.mode")
+        token = request.GET.get("hub.verify_token")
+        challenge = request.GET.get("hub.challenge")
 
+        if mode == "subscribe" and token == VERIFY_TOKEN:
+            return HttpResponse(challenge, status=200)
+
+        return HttpResponse("Token inválido", status=403)
+
+    # ====== POST: mensagens reais do WhatsApp ======
     if request.method == "POST":
-        data = json.loads(request.body.decode("utf-8"))
-
         try:
+            data = json.loads(request.body.decode("utf-8"))
+
             entry = data["entry"][0]["changes"][0]["value"]
             messages = entry.get("messages", [])
 
             if messages:
                 msg = messages[0]
                 phone = msg["from"]
-                text = msg["text"]["body"]
+                text = msg["text"]["body"] if "text" in msg else ""
 
-                client = Client.objects.first()  # ajustar se multi-clínica
+                # Pegamos o único cliente por enquanto
+                client = Client.objects.first()
+
+                # Cadastra contato
                 contact, _ = Contact.objects.get_or_create(
                     client=client,
                     phone=phone
                 )
 
+                # Salva mensagem
                 Conversation.objects.create(
                     client=client,
                     contato=contact,
                     sender=phone,
                     message=text,
-                    direction="incoming"
+                    direction="incoming",
+                    is_from_bot=False
                 )
 
         except Exception as e:
-            print("Erro no webhook:", e)
+            print("Erro no webhook WhatsApp:", e)
 
-        return HttpResponse("EVENT_RECEIVED")
+        return HttpResponse("EVENT_RECEIVED", status=200)
 
-
-@csrf_exempt
-def receive_message(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid method"}, status=405)
-
-    # ============================
-    # 1. API KEY
-    # ============================
-    api_key = request.GET.get("api_key")
-
-    try:
-        client = Client.objects.get(api_key=api_key)
-    except Client.DoesNotExist:
-        return JsonResponse({"error": "Invalid API Key"}, status=400)
-
-    # ============================
-    # 2. JSON recebido
-    # ============================
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except:
-        return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-    # Exemplo de payload do WPPConnect
-    sender = data.get("from", {}).get("remoteJid", "")
-    msg_text = data.get("text") or data.get("body") or ""
-
-    # ============================
-    # 3. Detecta se é mensagem do BOT
-    # ============================
-    # WPPConnect envia mensagens do bot com this.isMe == true
-    is_from_bot = str(data.get("from", {}).get("isMe", False)).lower() == "true"
-
-    # ============================
-    # 4. Reset mensal
-    # ============================
-    client.reset_monthly_limit_if_needed()
-
-    # ============================
-    # 5. Controle de limite (exceto mensagens do bot)
-    # ============================
-    plan = client.plan
-
-    is_unlimited = (
-        plan.max_conversations is None or
-        plan.max_conversations == 0
-    )
-
-    if not is_unlimited and not is_from_bot:
-        if client.conversations_used >= plan.max_conversations:
-            # Mesmo sem contar, salvamos no histórico
-            Conversation.objects.create(
-                client=client,
-                sender=sender,
-                message=msg_text,
-                direction="incoming",
-                is_from_bot=is_from_bot
-            )
-            return JsonResponse({"status": "limit_reached"})
-
-    # ============================
-    # 6. Salva no banco
-    # ============================
-    Conversation.objects.create(
-        client=client,
-        sender=sender,
-        message=msg_text,
-        direction="incoming" if not is_from_bot else "outgoing",
-        is_from_bot=is_from_bot
-    )
-
-    # ============================
-    # 7. Incrementa limite
-    # ============================
-    if not is_unlimited and not is_from_bot:
-        client.conversations_used += 1
-        client.save()
-
-    # ============================
-    # 8. Aviso de 80%
-    # ============================
-    if not is_unlimited:
-        if client.conversations_used >= int(plan.max_conversations * 0.8):
-            client.alert_upgrade = True
-            client.save()
-
-    return JsonResponse({"status": "received"})
+    return HttpResponse(status=405)
