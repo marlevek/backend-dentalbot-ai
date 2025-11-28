@@ -19,7 +19,12 @@ SECRET_KEY = 'django-insecure-vb3!1ut7(zfc3%0h=1d3a0k#a&z^v#t^w%wp)u#7^)deyn^3nf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".railway.app",
+    "backend-dentalbot-ai-production.up.railway.app"
+]
 
 
 # Application definition
