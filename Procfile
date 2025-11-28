@@ -1,0 +1,1 @@
+web: gunicorn dentalbot_ai.wsgi:application --log-file -
