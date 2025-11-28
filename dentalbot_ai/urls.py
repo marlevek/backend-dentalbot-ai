@@ -1,8 +1,15 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+
+
+
+def home_redirect(request):
+    return redirect("/dashboard/")
 
 
 urlpatterns = [
+    path("", home_redirect),  # ⬅️ redirecionamento automático
     path('admin/', admin.site.urls),
     
     # Apps principais 
